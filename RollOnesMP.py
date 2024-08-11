@@ -1,4 +1,5 @@
 import datetime
+import locale
 import multiprocessing
 
 import numpy
@@ -19,10 +20,11 @@ def worker(tries: int, res: multiprocessing.Value('i')):
 
 
 if __name__ == '__main__':
+    locale.setlocale(locale.LC_ALL, '')
     num_threads = 10
     tries = 100000000
     res = multiprocessing.Value('i', 0)
-    print(f"Number of Roll Sessions: {tries * num_threads}")
+    print(f"Number of Roll Sessions: {tries * num_threads:n}")
 
     d1 = datetime.datetime.now()
     print(d1)
