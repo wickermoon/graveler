@@ -5,7 +5,7 @@ import numpy
 from numpy.random import randint
 
 
-def worker(lock: multiprocessing.Lock, tries: int, res: multiprocessing.Value('i')):
+def worker(tries: int, res: multiprocessing.Value('i')):
     result = 0
     for _ in range(0, tries):
         rolled_array = randint(1, 5, size=231)
@@ -14,22 +14,20 @@ def worker(lock: multiprocessing.Lock, tries: int, res: multiprocessing.Value('i
         if result < numbers_of_rolled_ones:
             result = numbers_of_rolled_ones
 
-    with lock:
-        if result > res.value:
-            res.value = result
+    if result > res.value:
+        res.value = result
 
 
 if __name__ == '__main__':
     num_threads = 10
     tries = 100000000
     res = multiprocessing.Value('i', 0)
-    lock = multiprocessing.Lock()
     print(f"Number of Roll Sessions: {tries * num_threads}")
 
     d1 = datetime.datetime.now()
     print(d1)
 
-    jobs = [multiprocessing.Process(target=worker, args=(lock, tries, res)) for _ in range(num_threads)]
+    jobs = [multiprocessing.Process(target=worker, args=(tries, res)) for _ in range(num_threads)]
 
     for job in jobs:
         job.start()
