@@ -5,12 +5,9 @@ import numpy
 from numpy.random import randint
 
 
-roll_sessions = 1000000
-
-
-def worker(lock: multiprocessing.Lock, res: multiprocessing.Value('i')):
+def worker(lock: multiprocessing.Lock, tries: int, res: multiprocessing.Value('i')):
     result = 0
-    for _ in range(0, roll_sessions):
+    for _ in range(0, tries):
         rolled_array = randint(1, 5, size=231)
         numbers_of_rolled_ones = numpy.count_nonzero(rolled_array == 1)
 
@@ -23,16 +20,19 @@ def worker(lock: multiprocessing.Lock, res: multiprocessing.Value('i')):
 
 
 if __name__ == '__main__':
-    jobs = []
     num_threads = 10
+    tries = 100000000
     res = multiprocessing.Value('i', 0)
     lock = multiprocessing.Lock()
-    d1 = datetime.datetime.now()
+    print(f"Number of Roll Sessions: {tries * num_threads}")
 
-    for i in range(num_threads):
-        p = multiprocessing.Process(target=worker, args=(lock, res))
-        jobs.append(p)
-        p.start()
+    d1 = datetime.datetime.now()
+    print(d1)
+
+    jobs = [multiprocessing.Process(target=worker, args=(lock, tries, res)) for _ in range(num_threads)]
+
+    for job in jobs:
+        job.start()
 
     for job in jobs:
         job.join()
@@ -40,5 +40,4 @@ if __name__ == '__main__':
     d2 = datetime.datetime.now()
 
     print(f"Highest Ones Roll: {res.value}")
-    print(f"Number of Roll Sessions: {roll_sessions*num_threads}")
     print(f"Time taken: {d2 - d1}")
