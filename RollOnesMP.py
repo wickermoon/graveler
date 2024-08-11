@@ -5,7 +5,7 @@ import numpy
 from numpy.random import randint
 
 
-roll_sessions = 100000000
+roll_sessions = 1000000
 
 
 def worker(lock: multiprocessing.Lock, res: multiprocessing.Value('i')):
@@ -17,12 +17,9 @@ def worker(lock: multiprocessing.Lock, res: multiprocessing.Value('i')):
         if result < numbers_of_rolled_ones:
             result = numbers_of_rolled_ones
 
-    lock.acquire()
-    try:
+    with lock:
         if result > res.value:
             res.value = result
-    finally:
-        lock.release()
 
 
 if __name__ == '__main__':
