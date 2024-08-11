@@ -19,7 +19,8 @@ def worker(lock: multiprocessing.Lock, res: multiprocessing.Value('i')):
 
     lock.acquire()
     try:
-        res.value = result
+        if result > res.value:
+            res.value = result
     finally:
         lock.release()
 
