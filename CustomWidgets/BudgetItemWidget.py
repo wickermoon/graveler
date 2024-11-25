@@ -3,7 +3,7 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 
-class ListItemWidget(QWidget):
+class BudgetItemWidget(QWidget):
     def __init__(self, name: str, amount: str):
         super().__init__()
 

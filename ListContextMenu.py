@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QMenu, QListWidget, QListWidgetItem, QMessageBox
 
 import Preferences
 from AddEntryDialog import AddEntryDialog
-from ListItemWidget import ListItemWidget
+from CustomWidgets.BudgetItemWidget import BudgetItemWidget
 
 
 class ListContextMenu(QMenu):
@@ -22,7 +22,7 @@ class ListContextMenu(QMenu):
         self.addAction(new)
 
         if self.selected_item is not None:
-            proxy: ListItemWidget | None = self.source.itemWidget(self.selected_item)
+            proxy: BudgetItemWidget | None = self.source.itemWidget(self.selected_item)
 
             edit_item = QAction(f'Edit {proxy.name.text()}...', self)
             edit_item.setToolTip(f'Edits {proxy.name.text()}')
@@ -38,22 +38,22 @@ class ListContextMenu(QMenu):
         dlg = AddEntryDialog(f'Add {self.text.lower()}')
 
         if dlg.exec():
-            cli = ListItemWidget(dlg.name.text(), dlg.amount.text())
+            item_widget = BudgetItemWidget(dlg.name.text(), dlg.amount.text())
             new_item = QListWidgetItem(self.source)
-            new_item.setSizeHint(cli.sizeHint())
+            new_item.setSizeHint(item_widget.sizeHint())
 
             self.source.addItem(new_item)
-            self.source.setItemWidget(new_item, cli)
+            self.source.setItemWidget(new_item, item_widget)
             self.preferences.update_list_total(self.source)
 
     # noinspection PyTypeChecker
     def on_edit(self):
-        item_widget: ListItemWidget = self.source.itemWidget(self.selected_item)
+        item_widget: BudgetItemWidget = self.source.itemWidget(self.selected_item)
         dlg = AddEntryDialog(f'Edit {self.text.lower()}', item_widget.name.text(), item_widget.amount.text())
 
         if dlg.exec():
             self.source.removeItemWidget(self.selected_item)
-            cli = ListItemWidget(dlg.name.text(), dlg.amount.text())
+            cli = BudgetItemWidget(dlg.name.text(), dlg.amount.text())
             self.source.setItemWidget(self.selected_item, cli)
             self.preferences.update_list_total(self.source)
 

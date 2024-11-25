@@ -5,12 +5,11 @@ from decimal import Decimal
 
 from PyQt6.QtCore import QObject, QEvent
 from PyQt6.QtGui import QContextMenuEvent
-from PyQt6.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout, QListWidgetItem, QHBoxLayout, QVBoxLayout, \
-    QLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout, QListWidgetItem, QHBoxLayout, QVBoxLayout, QLayout
 
+from CustomWidgets.BudgetItemWidget import BudgetItemWidget
+from CustomWidgets.MoneyLabel import MoneyLabel
 from ListContextMenu import ListContextMenu
-from ListItemWidget import ListItemWidget
-from MoneyLabel import MoneyLabel
 
 INCOME_FILE = 'data/fixed_incomes'
 EXPENSES_FILE = 'data/fixed_expenses'
@@ -34,7 +33,7 @@ class Preferences(QWidget):
             lines = file.read().splitlines()
             for i, line in enumerate(lines):
                 items = line.split(';')
-                cli = ListItemWidget(items[2], items[0])
+                cli = BudgetItemWidget(items[2], items[0])
                 new_item = QListWidgetItem(list_widget)
                 new_item.setSizeHint(cli.sizeHint())
 
@@ -46,7 +45,7 @@ class Preferences(QWidget):
     def _update_list_total(list_widget: QListWidget, label):
         total = 0
         for index in range(0, list_widget.count()):
-            item_widget: ListItemWidget = list_widget.itemWidget(list_widget.item(index))
+            item_widget: BudgetItemWidget = list_widget.itemWidget(list_widget.item(index))
             total += float(item_widget.amount.text())
 
         label.setText(f'{total:.2f}')
