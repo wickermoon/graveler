@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QListWidget
+from PySide6.QtWidgets import QListWidget
 
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget
 

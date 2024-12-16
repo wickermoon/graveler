@@ -1,5 +1,5 @@
-from PyQt6.QtGui import QContextMenuEvent, QAction
-from PyQt6.QtWidgets import QMenu, QListWidget, QListWidgetItem, QMessageBox
+from PySide6.QtGui import QContextMenuEvent, QAction
+from PySide6.QtWidgets import QMenu, QListWidget, QListWidgetItem, QMessageBox
 
 from CustomWidgets.AddEntryDialog import AddEntryDialog
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget

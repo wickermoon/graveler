@@ -1,5 +1,5 @@
-from PyQt6.QtGui import QDoubleValidator
-from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QLineEdit
+from PySide6.QtGui import QDoubleValidator
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QLineEdit
 
 
 class AddEntryDialog(QDialog):

@@ -1,6 +1,5 @@
-import PyQt6.QtCore
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox
 
 from Preferences import Preferences
 from WeekTab import WeekTab

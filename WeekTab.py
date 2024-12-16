@@ -3,9 +3,9 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from PyQt6.QtCore import QObject
-from PyQt6.QtGui import QContextMenuEvent
-from PyQt6.QtWidgets import QLabel, QHBoxLayout, QListWidget, QVBoxLayout, QListWidgetItem
+from PySide6.QtCore import QObject
+from PySide6.QtGui import QContextMenuEvent
+from PySide6.QtWidgets import QLabel, QHBoxLayout, QListWidget, QVBoxLayout, QListWidgetItem
 
 import calculations
 import core

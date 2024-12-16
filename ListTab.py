@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt6.QtCore import QObject, QEvent
-from PyQt6.QtGui import QContextMenuEvent
-from PyQt6.QtWidgets import QWidget
+from PySide6.QtCore import QObject, QEvent
+from PySide6.QtGui import QContextMenuEvent
+from PySide6.QtWidgets import QWidget
 
 from CustomWidgets import ListContextMenu
 
