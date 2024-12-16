@@ -3,6 +3,7 @@ from typing import Optional
 from PySide6.QtCore import QObject, QEvent
 from PySide6.QtGui import QContextMenuEvent
 from PySide6.QtWidgets import QWidget
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 from CustomWidgets import ListContextMenu

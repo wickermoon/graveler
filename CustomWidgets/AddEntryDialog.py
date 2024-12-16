@@ -1,5 +1,6 @@
 from PySide6.QtGui import QDoubleValidator
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QLineEdit
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 class AddEntryDialog(QDialog):

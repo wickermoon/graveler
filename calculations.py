@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QListWidget
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget

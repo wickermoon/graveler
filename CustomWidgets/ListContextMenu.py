@@ -1,5 +1,6 @@
 from PySide6.QtGui import QContextMenuEvent, QAction
 from PySide6.QtWidgets import QMenu, QListWidget, QListWidgetItem, QMessageBox
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 from CustomWidgets.AddEntryDialog import AddEntryDialog

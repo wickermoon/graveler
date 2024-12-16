@@ -1,6 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 

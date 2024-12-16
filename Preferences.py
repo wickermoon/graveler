@@ -7,6 +7,7 @@ from typing import Optional
 from PySide6.QtCore import QObject
 from PySide6.QtGui import QContextMenuEvent
 from PySide6.QtWidgets import QLabel, QListWidget, QGridLayout, QListWidgetItem, QHBoxLayout, QVBoxLayout, QLayout
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 import calculations

@@ -1,5 +1,6 @@
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox
+# noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
 from Preferences import Preferences
