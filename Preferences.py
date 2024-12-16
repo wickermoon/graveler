@@ -2,21 +2,24 @@ import decimal
 from calendar import monthrange
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
-from PyQt6.QtCore import QObject, QEvent
+from PyQt6.QtCore import QObject
 from PyQt6.QtGui import QContextMenuEvent
-from PyQt6.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout, QListWidgetItem, QHBoxLayout, QVBoxLayout, QLayout
+from PyQt6.QtWidgets import QLabel, QListWidget, QGridLayout, QListWidgetItem, QHBoxLayout, QVBoxLayout, QLayout
 
+import calculations
+import core
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget
+from CustomWidgets.ListContextMenu import ListContextMenu
 from CustomWidgets.MoneyLabel import MoneyLabel
-from ListContextMenu import ListContextMenu
+from ListTab import ListTab
 
-INCOME_FILE = 'data/fixed_incomes'
-EXPENSES_FILE = 'data/fixed_expenses'
 
-class Preferences(QWidget):
+class Preferences(ListTab):
     def __init__(self):
         super().__init__()
+        decimal.getcontext().rounding = decimal.ROUND_DOWN
 
         self.layout = QGridLayout()
 
@@ -29,7 +32,8 @@ class Preferences(QWidget):
     @staticmethod
     def _load_list(list_widget: QListWidget, filepath: str) -> None:
         list_widget.clear()
-        with open(filepath) as file:
+        with open(filepath, 'a+') as file:
+            file.seek(0)
             lines = file.read().splitlines()
             for i, line in enumerate(lines):
                 items = line.split(';')
@@ -43,11 +47,7 @@ class Preferences(QWidget):
     # noinspection PyTypeChecker
     @staticmethod
     def _update_list_total(list_widget: QListWidget, label):
-        total = 0
-        for index in range(0, list_widget.count()):
-            item_widget: BudgetItemWidget = list_widget.itemWidget(list_widget.item(index))
-            total += float(item_widget.amount.text())
-
+        total = calculations.get_list_total(list_widget)
         label.setText(f'{total:.2f}')
 
     def _init_income(self) -> None:
@@ -59,7 +59,7 @@ class Preferences(QWidget):
         income_label_layout.addWidget(self.income_sum)
 
         self.income_list = QListWidget()
-        self._load_list(self.income_list, INCOME_FILE)
+        self._load_list(self.income_list, calculations.INCOME_FILE)
         self._update_list_total(self.income_list, self.income_sum)
 
         self.income_list.installEventFilter(self)
@@ -76,7 +76,7 @@ class Preferences(QWidget):
         expenses_label_layout.addWidget(self.expenses_sum)
 
         self.expenses_list = QListWidget()
-        self._load_list(self.expenses_list, EXPENSES_FILE)
+        self._load_list(self.expenses_list, calculations.EXPENSES_FILE)
         self._update_list_total(self.expenses_list, self.expenses_sum)
 
         self.expenses_list.installEventFilter(self)
@@ -85,29 +85,29 @@ class Preferences(QWidget):
         self.layout.addWidget(self.expenses_list, 1, 1)
 
     def _init_budget(self) -> None:
-        decimal.getcontext().rounding = decimal.ROUND_DOWN
-        budget = float(self.income_sum.text()) - float(self.expenses_sum.text())
-
         budget_layout = QVBoxLayout()
-        budget_layout.addLayout(self._init_general_budget(budget))
-        budget_layout.addLayout(self._init_yearly_budget(budget))
-        budget_layout.addLayout(self._init_weekly_budget(budget))
+        budget_layout.addLayout(self._init_general_budget())
+        budget_layout.addLayout(self._init_yearly_budget())
+        budget_layout.addLayout(self._init_weekly_budget())
+
+        self._recalculate()
 
         self.layout.addLayout(budget_layout, 2, 0, 1, 2)
 
-    def _init_general_budget(self, budget: float) -> QLayout:
+    def _init_general_budget(self) -> QLayout:
         general_budget = QHBoxLayout()
         general_budget.addWidget(QLabel('Budget: '))
-        self.budget_total = MoneyLabel(f'{Decimal(budget):.2f}')
+        self.budget_total = MoneyLabel()
         general_budget.addWidget(self.budget_total)
 
         return general_budget
 
-    def _init_yearly_budget(self, budget: float) -> QLayout:
+    def _init_yearly_budget(self) -> QLayout:
         yearly_budget = QVBoxLayout()
         yearly_budget.addWidget(QLabel('Yearly: '))
 
-        with open('data/yearly_expenses') as file:
+        with open(calculations.YEARLY_FILE, 'a+') as file:
+            file.seek(0)
             lines = file.read().splitlines()
             for line in lines:
                 line = line.split(';')
@@ -122,31 +122,26 @@ class Preferences(QWidget):
 
         return yearly_budget
 
-    def _init_weekly_budget(self, budget: float) -> QLayout:
+    def _init_weekly_budget(self) -> QLayout:
         weekly_budget = QVBoxLayout()
         weekly_budget.addWidget(QLabel('Weekly:'))
 
         current = QHBoxLayout()
         current.addWidget(MoneyLabel('Current:'))
 
-        now = datetime.now()
-        days = monthrange(now.year, now.month)[1]
-        day = now.day
-        multiplier = 7 if day < 22 else days - 21
-
-        self.current = MoneyLabel(f'{Decimal((budget / days) * multiplier):.2f}')
+        self.current = MoneyLabel()
         current.addWidget(self.current)
         weekly_budget.addLayout(current)
 
         week1 = QHBoxLayout()
         week1.addWidget(MoneyLabel('Weeks 1-3:'))
-        self.week1 = MoneyLabel(f'{Decimal((budget / 30) * 7):.2f} / {Decimal((budget / 31) * 7):.2f}')
+        self.week1 = MoneyLabel()
         week1.addWidget(self.week1)
         weekly_budget.addLayout(week1)
 
         week4 = QHBoxLayout()
         week4.addWidget(MoneyLabel('Weeks 4:'))
-        self.week4 = MoneyLabel(f'{Decimal((budget / 30) * 9):.2f} / {Decimal((budget / 31) * 10):.2f}')
+        self.week4 = MoneyLabel()
         week4.addWidget(self.week4)
         weekly_budget.addLayout(week4)
 
@@ -161,35 +156,26 @@ class Preferences(QWidget):
 
         self.budget_total.setText(f'{Decimal(budget):.2f}')
         self.current.setText(f'{Decimal((budget / days) * multiplier):.2f}')
-        self.week1.setText(f'{Decimal((budget / 30) * 7):.2f} / {Decimal((budget / 31) * 7):.2f}')
+        self.week1.setText(f'{Decimal(budget / 4):.2f} / {Decimal((budget / 30) * 7):.2f} / {Decimal((budget / 31) * 7):.2f}')
         self.week4.setText(f'{Decimal((budget / 30) * 9):.2f} / {Decimal((budget / 31) * 10):.2f}')
 
     # noinspection PyTypeChecker
-    def eventFilter(self, source: QObject, event: QEvent) -> None:
-        if event.type() == QEvent.Type.ContextMenu:
-            self.show_context_menu(source, event)
-            return True
-
-        return source.eventFilter(source, event)
-
-    # noinspection PyTypeChecker
-    def show_context_menu(self, source: QObject, event: QContextMenuEvent) -> ListContextMenu:
+    def show_context_menu(self, source: QObject, event: QContextMenuEvent, text: Optional[str] = '') -> ListContextMenu:
         text = 'Income' if source is self.income_list else 'Expense'
 
-        context = ListContextMenu(self, source, event, text)
-        context.exec(event.globalPos())
+        super().show_context_menu(source, event, text)
+
+    def update_list_total(self):
+        self._update_list_total(self.income_list, self.income_sum)
+        self._update_list_total(self.expenses_list, self.expenses_sum)
+        self._recalculate()
 
     def reload_data(self):
-        self._load_list(self.income_list, INCOME_FILE)
-        self._load_list(self.expenses_list, EXPENSES_FILE)
+        self._load_list(self.income_list, calculations.INCOME_FILE)
+        self._load_list(self.expenses_list, calculations.EXPENSES_FILE)
 
-        self.update_list_total(self.income_list)
-        self.update_list_total(self.expenses_list)
+        self.update_list_total()
 
-    def update_list_total(self, list_widget):
-        if list_widget is self.income_list:
-            self._update_list_total(self.income_list, self.income_sum)
-        else:
-            self._update_list_total(self.expenses_list, self.expenses_sum)
-
-        self._recalculate()
+    def save_data(self):
+        core.save_data(self.income_list, calculations.INCOME_FILE)
+        core.save_data(self.expenses_list, calculations.EXPENSES_FILE)

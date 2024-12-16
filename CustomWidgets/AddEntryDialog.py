@@ -27,8 +27,8 @@ class AddEntryDialog(QDialog):
         self.amount.setValidator(validator)
 
         dialog_layout = QVBoxLayout()
-        dialog_layout.addWidget(self.name)
         dialog_layout.addWidget(self.amount)
+        dialog_layout.addWidget(self.name)
         dialog_layout.addWidget(self.buttonBox)
 
         self.setLayout(dialog_layout)
