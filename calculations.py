@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QListWidget
+from __feature__ import snake_case, true_property
 
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget
 
@@ -19,7 +20,7 @@ def calculate_sum(file: str):
 # noinspection PyTypeChecker
 def get_list_total(list_widget: QListWidget):
     total = 0
-    for index in range(0, list_widget.count()):
-        item_widget: BudgetItemWidget = list_widget.itemWidget(list_widget.item(index))
-        total += float(item_widget.amount.text())
+    for index in range(0, list_widget.count):
+        item_widget: BudgetItemWidget = list_widget.item_widget(list_widget.item(index))
+        total += float(item_widget.amount.text)
     return total

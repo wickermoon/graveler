@@ -3,9 +3,10 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, QEvent
 from PySide6.QtGui import QContextMenuEvent
 from PySide6.QtWidgets import QLabel, QHBoxLayout, QListWidget, QVBoxLayout, QListWidgetItem
+from __feature__ import snake_case, true_property
 
 import calculations
 import core
@@ -26,7 +27,7 @@ class WeekTab(ListTab):
         self._init_expenses()
         self._init_current()
 
-        self.setLayout(self.layout)
+        self.set_layout(self.layout)
         self._load_information()
 
     def _init_budget(self):
@@ -34,36 +35,36 @@ class WeekTab(ListTab):
         self.budget = MoneyLabel()
 
         budget_layout = QHBoxLayout()
-        budget_layout.addWidget(budget_label)
-        budget_layout.addWidget(self.budget)
+        budget_layout.add_widget(budget_label)
+        budget_layout.add_widget(self.budget)
 
-        self.layout.addLayout(budget_layout)
+        self.layout.add_layout(budget_layout)
 
     def _init_expenses(self):
         self.expenses_list = QListWidget()
-        self.expenses_list.installEventFilter(self)
-        self.layout.addWidget(self.expenses_list)
+        self.expenses_list.install_event_filter(self)
+        self.layout.add_widget(self.expenses_list)
 
     def _init_current(self):
         sum_label = QLabel('Total:')
         self.total = MoneyLabel()
 
         sum_layout = QHBoxLayout()
-        sum_layout.addWidget(sum_label)
-        sum_layout.addWidget(self.total)
+        sum_layout.add_widget(sum_label)
+        sum_layout.add_widget(self.total)
 
         current_label = QLabel('Current budget:')
         self.current = MoneyLabel()
 
         current_layout = QHBoxLayout()
-        current_layout.addWidget(current_label)
-        current_layout.addWidget(self.current)
+        current_layout.add_widget(current_label)
+        current_layout.add_widget(self.current)
 
         layout = QVBoxLayout()
-        layout.addLayout(sum_layout)
-        layout.addLayout(current_layout)
+        layout.add_layout(sum_layout)
+        layout.add_layout(current_layout)
 
-        self.layout.addLayout(layout)
+        self.layout.add_layout(layout)
 
     def _load_information(self):
         self._load_budget()
@@ -84,7 +85,7 @@ class WeekTab(ListTab):
         else:
             text = f'{Decimal((budget / days) * 7):.2f}'
 
-        self.budget.setText(text)
+        self.budget.text = text
 
     def _load_expenses(self):
         self.expenses_list.clear()
@@ -99,19 +100,19 @@ class WeekTab(ListTab):
                 items = line.split(';')
                 cli = BudgetItemWidget(items[2], items[0])
                 new_item = QListWidgetItem(self.expenses_list)
-                new_item.setSizeHint(cli.sizeHint())
+                new_item.set_size_hint(cli.size_hint)
 
-                self.expenses_list.addItem(new_item)
-                self.expenses_list.setItemWidget(new_item, cli)
+                self.expenses_list.add_item(new_item)
+                self.expenses_list.set_item_widget(new_item, cli)
 
     def _calculate_total(self):
         total = calculations.get_list_total(self.expenses_list)
-        self.total.setText(f'{Decimal(total):.2f}')
+        self.total.text = f'{Decimal(total):.2f}'
 
     def _calculate_current(self):
-        budget = float(self.budget.text())
+        budget = float(self.budget.text)
         total = calculations.get_list_total(self.expenses_list)
-        self.current.setText(f'{Decimal(budget - total):.2f}')
+        self.current.text = f'{Decimal(budget - total):.2f}'
 
     # noinspection PyTypeChecker
     def show_context_menu(self, source: QObject, event: QContextMenuEvent, text: Optional[str] = 'Expense') -> ListContextMenu:
