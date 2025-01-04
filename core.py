@@ -11,4 +11,4 @@ def save_data(target_list: QListWidget, filepath):
         for index in range(0, target_list.count):
             entry = target_list.item(index)
             item_widget: BudgetItemWidget = target_list.item_widget(entry)
-            file.write(f'{item_widget.amount.text()};01;{item_widget.name.text()}\n')
+            file.write(f'{item_widget.amount.text};01;{item_widget.name.text}\n')
