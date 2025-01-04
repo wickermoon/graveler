@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from PySide6.QtCore import QObject, QEvent
+from PySide6.QtCore import QObject
 from PySide6.QtGui import QContextMenuEvent
 from PySide6.QtWidgets import QLabel, QHBoxLayout, QListWidget, QVBoxLayout, QListWidgetItem
 # noinspection PyUnresolvedReferences
@@ -14,7 +14,7 @@ import core
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget
 from CustomWidgets.ListContextMenu import ListContextMenu
 from CustomWidgets.MoneyLabel import MoneyLabel
-from ListTab import ListTab
+from CustomWidgets.ListTab import ListTab
 
 
 class WeekTab(ListTab):
@@ -23,6 +23,9 @@ class WeekTab(ListTab):
 
         self.name = name
         self.layout = QVBoxLayout()
+
+        current_date = datetime.now()
+        self.filepath = f'data/weeks/{current_date.year}_{current_date.month:02}_{self.name}'
 
         self._init_budget()
         self._init_expenses()
@@ -42,9 +45,10 @@ class WeekTab(ListTab):
         self.layout.add_layout(budget_layout)
 
     def _init_expenses(self):
-        self.expenses_list = QListWidget()
-        self.expenses_list.install_event_filter(self)
-        self.layout.add_widget(self.expenses_list)
+        self.expenses = QListWidget()
+        self.expenses.install_event_filter(self)
+
+        self.layout.add_widget(self.expenses)
 
     def _init_current(self):
         sum_label = QLabel('Total:')
@@ -89,30 +93,26 @@ class WeekTab(ListTab):
         self.budget.text = text
 
     def _load_expenses(self):
-        self.expenses_list.clear()
+        self.expenses.clear()
 
-        current_date = datetime.now()
-        filepath = f'data/weeks/{self.name}_{current_date.month}_{current_date.year}'
-
-        with open(filepath, 'a+') as file:
+        with open(self.filepath, 'a+') as file:
             file.seek(0)
             lines = file.read().splitlines()
             for i, line in enumerate(lines):
                 items = line.split(';')
                 cli = BudgetItemWidget(items[2], items[0])
-                new_item = QListWidgetItem(self.expenses_list)
+                new_item = QListWidgetItem(self.expenses)
                 new_item.set_size_hint(cli.size_hint)
 
-                self.expenses_list.add_item(new_item)
-                self.expenses_list.set_item_widget(new_item, cli)
+                self.expenses.set_item_widget(new_item, cli)
 
     def _calculate_total(self):
-        total = calculations.get_list_total(self.expenses_list)
+        total = calculations.get_list_total(self.expenses)
         self.total.text = f'{Decimal(total):.2f}'
 
     def _calculate_current(self):
         budget = float(self.budget.text)
-        total = calculations.get_list_total(self.expenses_list)
+        total = calculations.get_list_total(self.expenses)
         self.current.text = f'{Decimal(budget - total):.2f}'
 
     # noinspection PyTypeChecker
@@ -128,6 +128,4 @@ class WeekTab(ListTab):
         self._calculate_current()
 
     def save_data(self):
-        current_date = datetime.now()
-        filepath = f'data/weeks/{self.name}_{current_date.month}_{current_date.year}'
-        core.save_data(self.expenses_list, filepath)
+        core.save_data(self.expenses, self.filepath)

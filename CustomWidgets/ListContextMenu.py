@@ -3,9 +3,9 @@ from PySide6.QtWidgets import QMenu, QListWidget, QListWidgetItem, QMessageBox
 # noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
-from CustomWidgets.AddEntryDialog import AddEntryDialog
-from CustomWidgets.BudgetItemWidget import BudgetItemWidget
-from ListTab import ListTab
+from CustomWidgets import BudgetItemWidget
+from CustomWidgets import AddEntryDialog
+from CustomWidgets import ListTab
 
 
 class ListContextMenu(QMenu):
@@ -44,7 +44,6 @@ class ListContextMenu(QMenu):
             new_item = QListWidgetItem(self.source)
             new_item.set_size_hint(item_widget.size_hint)
 
-            self.source.add_item(new_item)
             self.source.set_item_widget(new_item, item_widget)
             self.parent.update_list_total()
 
@@ -55,7 +54,7 @@ class ListContextMenu(QMenu):
 
         if dlg.exec():
             self.source.remove_item_widget(self.selected_item)
-            cli = BudgetItemWidget(dlg.name.text(), dlg.amount.text)
+            cli = BudgetItemWidget(dlg.name.text, dlg.amount.text)
             self.source.set_item_widget(self.selected_item, cli)
             self.parent.update_list_total()
 

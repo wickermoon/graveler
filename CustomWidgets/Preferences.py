@@ -15,7 +15,7 @@ import core
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget
 from CustomWidgets.ListContextMenu import ListContextMenu
 from CustomWidgets.MoneyLabel import MoneyLabel
-from ListTab import ListTab
+from CustomWidgets.ListTab import ListTab
 
 
 class Preferences(ListTab):

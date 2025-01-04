@@ -1,16 +1,17 @@
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox
+from PySide6.QtGui import QAction, QIcon
+from PySide6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox, QSystemTrayIcon
 # noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
-from Preferences import Preferences
-from WeekTab import WeekTab
-from ListTab import ListTab
+from CustomWidgets.ListTab import ListTab
+from CustomWidgets.Preferences import Preferences
+from CustomWidgets.WeekTab import WeekTab
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
         self.window_title = "My App"
         self.set_fixed_size(1024, 768)
 
@@ -39,14 +40,11 @@ class MainWindow(QMainWindow):
         toolbar.add_action(load_action)
 
     def on_save(self):
-        button = QMessageBox.question(self, f'Save preferences', 'Save preferences?', (QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No), QMessageBox.StandardButton.No)
-
-        if button == QMessageBox.StandardButton.Yes:
-            for tab_index in range(0, self.tabs.count):
-                tab = self.tabs.widget(tab_index)
-                if isinstance(tab, ListTab):
-                    tab.save_data()
-            self.on_preferences_changed()
+        for tab_index in range(0, self.tabs.count):
+            tab = self.tabs.widget(tab_index)
+            if isinstance(tab, ListTab):
+                tab.save_data()
+        self.on_preferences_changed()
 
     def on_load(self):
         button = QMessageBox.question(self, f'Reload preferences', 'Reload all preferences without saving?', (QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No), QMessageBox.StandardButton.No)
@@ -60,3 +58,7 @@ class MainWindow(QMainWindow):
 
             if isinstance(tab, WeekTab):
                 tab.refresh()
+
+    def close_event(self, event):
+        event.ignore()
+        self.hide()

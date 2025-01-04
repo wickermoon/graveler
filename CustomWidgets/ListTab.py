@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QWidget
 # noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
-from CustomWidgets import ListContextMenu
+from . import ListContextMenu
 
 
 class ListTab(QWidget):
@@ -22,7 +22,7 @@ class ListTab(QWidget):
         return super().event_filter(source, event)
 
     # noinspection PyTypeChecker
-    def show_context_menu(self, source: QObject, event: QContextMenuEvent, text: Optional[str] = '<Template>') -> ListContextMenu:
+    def show_context_menu(self, source: QObject, event: QContextMenuEvent, text: Optional[str] = '<Template>') -> None:
         context = ListContextMenu.ListContextMenu(self, source, event, text)
         context.exec(event.global_pos())
 
