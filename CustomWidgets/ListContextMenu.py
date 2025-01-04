@@ -54,8 +54,8 @@ class ListContextMenu(QMenu):
 
         if dlg.exec():
             self.source.remove_item_widget(self.selected_item)
-            cli = BudgetItemWidget(dlg.name.text, dlg.amount.text)
-            self.source.set_item_widget(self.selected_item, cli)
+            item_widget = BudgetItemWidget(dlg.name.text, dlg.amount.text)
+            self.source.set_item_widget(self.selected_item, item_widget)
             self.parent.update_list_total()
 
     def on_remove(self):

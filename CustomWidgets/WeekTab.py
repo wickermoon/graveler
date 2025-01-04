@@ -24,9 +24,6 @@ class WeekTab(ListTab):
         self.name = name
         self.layout = QVBoxLayout()
 
-        current_date = datetime.now()
-        self.filepath = f'data/weeks/{current_date.year}_{current_date.month:02}_{self.name}'
-
         self._init_budget()
         self._init_expenses()
         self._init_current()
@@ -95,16 +92,17 @@ class WeekTab(ListTab):
     def _load_expenses(self):
         self.expenses.clear()
 
-        with open(self.filepath, 'a+') as file:
+        with open(core.filepath, 'a+') as file:
             file.seek(0)
             lines = file.read().splitlines()
             for i, line in enumerate(lines):
                 items = line.split(';')
-                cli = BudgetItemWidget(items[2], items[0])
-                new_item = QListWidgetItem(self.expenses)
-                new_item.set_size_hint(cli.size_hint)
+                if items[1] == self.name:
+                    cli = BudgetItemWidget(items[2], items[0])
+                    new_item = QListWidgetItem(self.expenses)
+                    new_item.set_size_hint(cli.size_hint)
 
-                self.expenses.set_item_widget(new_item, cli)
+                    self.expenses.set_item_widget(new_item, cli)
 
     def _calculate_total(self):
         total = calculations.get_list_total(self.expenses)
@@ -127,5 +125,11 @@ class WeekTab(ListTab):
         self._load_budget()
         self._calculate_current()
 
-    def save_data(self):
-        core.save_data(self.expenses, self.filepath)
+    def save_data(self) -> [str]:
+        result = list()
+        for index in range(0, self.expenses.count):
+            entry = self.expenses.item(index)
+            item_widget: BudgetItemWidget = self.expenses.item_widget(entry)
+            result.append(f'{item_widget.amount.text};{self.name};{item_widget.name.text}\n')
+
+        return result

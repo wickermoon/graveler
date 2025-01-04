@@ -1,9 +1,9 @@
-from PySide6.QtGui import QAction, QIcon
-from PySide6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox, QSystemTrayIcon
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow, QTabWidget, QToolBar, QMessageBox
 # noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
-from CustomWidgets.ListTab import ListTab
+import core
 from CustomWidgets.Preferences import Preferences
 from CustomWidgets.WeekTab import WeekTab
 
@@ -40,10 +40,19 @@ class MainWindow(QMainWindow):
         toolbar.add_action(load_action)
 
     def on_save(self):
+        week_list = list()
         for tab_index in range(0, self.tabs.count):
             tab = self.tabs.widget(tab_index)
-            if isinstance(tab, ListTab):
+            if isinstance(tab, Preferences):
                 tab.save_data()
+            elif isinstance(tab, WeekTab):
+                week_list.append(tab.save_data())
+
+        with open(core.filepath, 'w+') as file:
+            for week in week_list:
+                for entry in week:
+                    file.write(entry)
+
         self.on_preferences_changed()
 
     def on_load(self):
