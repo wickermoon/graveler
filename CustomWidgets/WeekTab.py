@@ -5,7 +5,7 @@ from typing import Optional
 
 from PySide6.QtCore import QObject
 from PySide6.QtGui import QContextMenuEvent
-from PySide6.QtWidgets import QLabel, QHBoxLayout, QListWidget, QVBoxLayout, QListWidgetItem
+from PySide6.QtWidgets import QLabel, QHBoxLayout, QListWidget, QVBoxLayout, QListWidgetItem, QAbstractItemView
 # noinspection PyUnresolvedReferences
 from __feature__ import snake_case, true_property
 
@@ -13,8 +13,8 @@ import calculations
 import core
 from CustomWidgets.BudgetItemWidget import BudgetItemWidget
 from CustomWidgets.ListContextMenu import ListContextMenu
-from CustomWidgets.MoneyLabel import MoneyLabel
 from CustomWidgets.ListTab import ListTab
+from CustomWidgets.MoneyLabel import MoneyLabel
 
 
 class WeekTab(ListTab):
@@ -44,6 +44,8 @@ class WeekTab(ListTab):
     def _init_expenses(self):
         self.expenses = QListWidget()
         self.expenses.install_event_filter(self)
+        self.expenses.drag_enabled = True
+        self.expenses.drag_drop_mode = QAbstractItemView.DragDropMode.InternalMove
 
         self.layout.add_widget(self.expenses)
 
@@ -98,11 +100,11 @@ class WeekTab(ListTab):
             for i, line in enumerate(lines):
                 items = line.split(';')
                 if items[1] == self.name:
-                    cli = BudgetItemWidget(items[2], items[0])
                     new_item = QListWidgetItem(self.expenses)
-                    new_item.set_size_hint(cli.size_hint)
+                    new_item_ui = BudgetItemWidget(items[2], items[0])
+                    new_item.set_size_hint(new_item_ui.size_hint)
 
-                    self.expenses.set_item_widget(new_item, cli)
+                    self.expenses.set_item_widget(new_item, new_item_ui)
 
     def _calculate_total(self):
         total = calculations.get_list_total(self.expenses)
