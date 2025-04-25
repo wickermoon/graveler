@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.window_title = "My App"
+        self.window_title = 'Budget Planner'
         self.set_fixed_size(1024, 768)
 
         self.tabs = QTabWidget()
