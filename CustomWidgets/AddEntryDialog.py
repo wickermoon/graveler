@@ -24,7 +24,6 @@ class AddEntryDialog(QDialog):
 
         validator = QDoubleValidator()
         validator.decimals = 2
-        validator.bottom = 0
         self.amount.set_validator(validator)
 
         dialog_layout = QVBoxLayout()
